@@ -8,7 +8,6 @@ module SidekiqStatusMonitor
                   :port,
                   :path,
                   :server,
-                  :custom_probe,
                   :logger,
                   :shutdown_callback,
                   :workers_size_threshold,
@@ -28,7 +27,6 @@ module SidekiqStatusMonitor
       @port = ENV.fetch("SIDEKIQ_STATUS_PORT", 7433)
       @server = ENV.fetch("SIDEKIQ_STATUS_SERVER", "webrick")
 
-      @custom_probe = proc { true }
       @shutdown_callback = proc {}
 
       @workers_size_threshold = 0

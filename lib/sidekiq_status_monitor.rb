@@ -15,6 +15,7 @@ require "sidekiq_status_monitor/helpers"
 
 module SidekiqStatusMonitor
   CAPSULE_NAME = "sidekiq-status"
+  PROBE_METHOD_PREFIX = "probe_"
 
   class << self
     def start
@@ -100,27 +101,42 @@ module SidekiqStatusMonitor
       queues.map(&:name).uniq.sort
     end
 
+    def self.new_probe(name, &block)
+      define_method("#{PROBE_METHOD_PREFIX}#{name}", &block)
+    end
+
+    new_probe :workers_size do
+      !config.workers_size_threshold || workers_size && workers_size >= config.workers_size_threshold
+    end
+
+    new_probe :process_set_size do
+      !config.process_set_size_threshold || process_set_size && process_set_size >= config.process_set_size_threshold
+    end
+
+    new_probe :queues_size do
+      !config.queues_size_threshold || queues_size && queues_size >= config.queues_size_threshold
+    end
+
+    new_probe :queue_avg_latency do
+      !config.queue_latency_threshold || queues_avg_latency && queues_avg_latency < config.queue_latency_threshold
+    end
+
+    new_probe :queue_avg_size do
+      !config.queue_size_threshold || queues_avg_size && queues_avg_size < config.queue_size_threshold
+    end
+
+    def probes
+      methods.grep(/^#{PROBE_METHOD_PREFIX}/).map { |m| [m, send(m)] }.to_h
+    end
+
     def alive?
-      [
-        !config.workers_size_threshold || workers_size && workers_size >= config.workers_size_threshold,
-        !config.process_set_size_threshold || process_set_size && process_set_size >= config.process_set_size_threshold,
-        !config.queues_size_threshold || queues_size && queues_size >= config.queues_size_threshold,
-        !config.queue_latency_threshold || queues_avg_latency && queues_avg_latency < config.queue_latency_threshold,
-        !config.queue_size_threshold || queues_avg_size && queues_avg_size < config.queue_size_threshold,
-        !config.custom_probe || config.custom_probe.call == true
-      ].all?
+      probes.values.all? { |v| v == true }
     end
 
     def info
-      {
-        alive: alive?,
-        workers_size: workers_size,
-        process_set_size: process_set_size,
-        queues_size: queues_size,
-        queues_avg_latency: queues_avg_latency,
-        queues_avg_size: queues_avg_size,
-        custom_probe: config.custom_probe&.call == true
-      }
+      probes.merge(
+        alive: alive?
+      )
     end
   end
 end

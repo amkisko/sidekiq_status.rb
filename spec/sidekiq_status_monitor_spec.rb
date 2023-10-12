@@ -96,7 +96,6 @@ RSpec.describe(SidekiqStatusMonitor) do
           allow(SidekiqStatusMonitor).to(receive(:process_set_size) { 1 })
           allow(SidekiqStatusMonitor).to(receive(:queues_size) { 1 })
           allow(SidekiqStatusMonitor).to(receive(:queues_avg_size) { 0 })
-          allow(SidekiqStatusMonitor).to(receive(:custom_probe) { true })
         end
         it "returns true" do
           expect(SidekiqStatusMonitor.alive?).to(be_truthy)
@@ -104,12 +103,11 @@ RSpec.describe(SidekiqStatusMonitor) do
         it "returns info" do
           expect(SidekiqStatusMonitor.info).to(eq(
             alive: true,
-            workers_size: 0,
-            process_set_size: 1,
-            queues_size: 1,
-            queues_avg_latency: 0,
-            queues_avg_size: 0,
-            custom_probe: true,
+            probe_workers_size: true,
+            probe_process_set_size: true,
+            probe_queues_size: true,
+            probe_queue_avg_latency: true,
+            probe_queue_avg_size: true
           ))
         end
       end

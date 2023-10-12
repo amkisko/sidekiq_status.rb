@@ -11,12 +11,11 @@ RSpec.describe(SidekiqStatusMonitor::Server) do
   let(:info_response) do
     {
       alive: true,
-      workers_size: 0,
-      process_set_size: 0,
-      queues_size: 0,
-      queues_avg_latency: nil,
-      queues_avg_size: nil,
-      custom_probe: true
+      probe_workers_size: true,
+      probe_process_set_size: false,
+      probe_queues_size: false,
+      probe_queue_avg_latency: nil,
+      probe_queue_avg_size: nil
     }
   end
 
@@ -70,7 +69,7 @@ RSpec.describe(SidekiqStatusMonitor::Server) do
       it "responds with success when the service is alive" do
         get "/"
         expect(last_response).to(be_ok)
-        expect(last_response.body).to(eq(info_response.to_json))
+        expect(JSON.parse(last_response.body, symbolize_names: true)).to(eq(info_response))
       end
     end
 
@@ -81,7 +80,7 @@ RSpec.describe(SidekiqStatusMonitor::Server) do
       it "responds to random path" do
         get "/unknown-path"
         expect(last_response).not_to(be_ok)
-        expect(last_response.body).to(eq(info_response.merge(alive: false).to_json))
+        expect(JSON.parse(last_response.body, symbolize_names: true)).to(eq(info_response.merge(alive: false)))
       end
     end
   end

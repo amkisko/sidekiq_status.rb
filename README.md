@@ -201,13 +201,6 @@ SidekiqStatusMonitor.setup do |config|
   #
   #   config.port = 7433
 
-  # ==> Custom Liveness Probe
-  # Extra check to decide if restart the pod or not for example connection to DB.
-  # `false`, `nil` or `raise` will not write the liveness probe
-  # default: proc { true }
-  #
-  #     config.custom_probe = proc { db_running? }
-
   # ==> Shutdown callback
   # When sidekiq process is shutting down, you can perform some action, like cleaning up created queue
   # default: proc {}
