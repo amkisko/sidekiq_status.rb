@@ -1,11 +1,11 @@
-# SidekiqStatus
+# SidekiqStatusMonitor
 
-[![Gem Version](https://badge.fury.io/rb/sidekiq_status.svg)](https://rubygems.org/gems/sidekiq_status)
-[![Total Downloads](https://img.shields.io/gem/dt/sidekiq_status?color=blue)](https://rubygems.org/gems/https://rubygems.org/gems/sidekiq_status)
+[![Gem Version](https://badge.fury.io/rb/sidekiq_status_monitor.svg)](https://rubygems.org/gems/sidekiq_status_monitor)
+[![Total Downloads](https://img.shields.io/gem/dt/sidekiq_status_monitor?color=blue)](https://rubygems.org/gems/https://rubygems.org/gems/sidekiq_status_monitor)
 
 ---
 
-SidekiqStatus offers a solution to add liveness probe for a Sidekiq instance deployed in Kubernetes.
+SidekiqStatusMonitor offers a solution to add liveness probe for a Sidekiq instance deployed in Kubernetes.
 This library can be used to check sidekiq health outside kubernetes.
 
 **How?**
@@ -19,21 +19,21 @@ This worker is responsible to requeue itself for the next liveness probe.
 
 Each instance in kubernetes will be checked based on `ENV` variable `HOSTNAME` (kubernetes sets this for each replica/pod).
 
-On initialization SidekiqStatus will asign to Sidekiq::Worker a queue with the current host and add this queue to the current instance queues to process.
+On initialization SidekiqStatusMonitor will asign to Sidekiq::Worker a queue with the current host and add this queue to the current instance queues to process.
 
 example:
 
 ```
 hostname: foo
-  Worker queue: sidekiq_status-foo
+  Worker queue: sidekiq_status_monitor-foo
   instance queues:
-   - sidekiq_status-foo
+   - sidekiq_status_monitor-foo
    *- your queues
 
 hostname: bar
-  Worker queue: sidekiq_status-bar
+  Worker queue: sidekiq_status_monitor-bar
   instance queues:
-   - sidekiq_status-bar
+   - sidekiq_status_monitor-bar
    *- your queues
 ```
 
@@ -42,7 +42,7 @@ hostname: bar
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sidekiq_status'
+gem 'sidekiq_status_monitor'
 ```
 
 And then execute:
@@ -51,11 +51,11 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install sidekiq_status
+    $ gem install sidekiq_status_monitor
 
 ## Usage
 
-SidekiqStatus will start when running `sidekiq` command.
+SidekiqStatusMonitor will start when running `sidekiq` command.
 
 Run `Sidekiq`:
 
@@ -186,7 +186,7 @@ spec:
 ## Options
 
 ```ruby
-SidekiqStatus.setup do |config|
+SidekiqStatusMonitor.setup do |config|
   # ==> Server host
   # Host to bind the server.
   # Can also be set with the environment variable sidekiq_status_HOST.
@@ -213,7 +213,7 @@ SidekiqStatus.setup do |config|
   # default: proc {}
   #
   #    config.shutdown_callback = proc do
-  #      Sidekiq::Queue.all.find { |q| q.name == "#{config.queue_prefix}-#{SidekiqStatus.hostname}" }&.clear
+  #      Sidekiq::Queue.all.find { |q| q.name == "#{config.queue_prefix}-#{SidekiqStatusMonitor.hostname}" }&.clear
   #    end
 
   # ==> Rack server
@@ -233,7 +233,7 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/arturictus/sidekiq_status. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/arturictus/sidekiq_status_monitor. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 

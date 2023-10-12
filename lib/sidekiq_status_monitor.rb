@@ -5,28 +5,28 @@ require "singleton"
 require "sidekiq"
 require "sidekiq/api"
 
-require "sidekiq_status/version"
+require "sidekiq_status_monitor/version"
 
-require "sidekiq_status/config"
+require "sidekiq_status_monitor/config"
 
-require "sidekiq_status/server"
-require "sidekiq_status/redis"
-require "sidekiq_status/helpers"
+require "sidekiq_status_monitor/server"
+require "sidekiq_status_monitor/redis"
+require "sidekiq_status_monitor/helpers"
 
-module SidekiqStatus
+module SidekiqStatusMonitor
   CAPSULE_NAME = "sidekiq-status"
 
   class << self
     def start
       Sidekiq.configure_server do |sidekiq_config|
         sidekiq_config.on(:startup) do
-          logger.info("Starting SidekiqStatus #{SidekiqStatus::VERSION}")
+          logger.info("Starting SidekiqStatusMonitor #{SidekiqStatusMonitor::VERSION}")
 
           @server_pid = fork do
-            SidekiqStatus::Server.new.run!
+            SidekiqStatusMonitor::Server.new.run!
           end
 
-          logger.info("SidekiqStatus started, #{config.server} pid #{@server_pid}")
+          logger.info("SidekiqStatusMonitor started, #{config.server} pid #{@server_pid}")
         end
 
         sidekiq_config.on(:quiet) do
@@ -39,7 +39,7 @@ module SidekiqStatus
 
           config.shutdown_callback.call
 
-          logger.info("SidekiqStatus stopped")
+          logger.info("SidekiqStatusMonitor stopped")
         end
       end
     end
@@ -49,7 +49,7 @@ module SidekiqStatus
     end
 
     def redis
-      @redis ||= SidekiqStatus::Redis.adapter
+      @redis ||= SidekiqStatusMonitor::Redis.adapter
     end
 
     def logger
@@ -57,7 +57,7 @@ module SidekiqStatus
     end
 
     def config
-      @config ||= SidekiqStatus::Config.instance
+      @config ||= SidekiqStatusMonitor::Config.instance
     end
 
     def hostname
@@ -125,4 +125,4 @@ module SidekiqStatus
   end
 end
 
-SidekiqStatus.start unless ENV.fetch("DISABLE_SIDEKIQ_STATUS", "")&.to_s&.gsub(/true|1/i, "true") == "true"
+SidekiqStatusMonitor.start unless ENV.fetch("DISABLE_SIDEKIQ_STATUS", "")&.to_s&.gsub(/true|1/i, "true") == "true"

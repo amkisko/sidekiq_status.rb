@@ -17,8 +17,8 @@ if [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]]; then
   exit 1
 fi
 
-GEM_NAME="sidekiq_status"
-VERSION=$(grep -Eo "VERSION\s*=\s*'.+'" lib/sidekiq_status/version.rb  | grep -Eo "[0-9.]{5,}")
+GEM_NAME="sidekiq_status_monitor"
+VERSION=$(grep -Eo "VERSION\s*=\s*'.+'" lib/sidekiq_status_monitor/version.rb  | grep -Eo "[0-9.]{5,}")
 GEM_FILE="$GEM_NAME-$VERSION.gem"
 
 e "gem build $GEM_NAME.gemspec"

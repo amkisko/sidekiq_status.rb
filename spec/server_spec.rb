@@ -3,7 +3,7 @@
 require "rack/test"
 require "net/http"
 
-RSpec.describe(SidekiqStatus::Server) do
+RSpec.describe(SidekiqStatusMonitor::Server) do
   include Rack::Test::Methods
 
   subject(:app) { described_class.new }
@@ -27,11 +27,11 @@ RSpec.describe(SidekiqStatus::Server) do
 
     let(:fake_webrick) { double }
 
-    it "runs the handler with sidekiq_status logger, host and no access logs" do
+    it "runs the handler with sidekiq_status_monitor logger, host and no access logs" do
       expect(fake_webrick).to(receive(:run).with(
         app,
         hash_including(
-          Logger: SidekiqStatus.logger,
+          Logger: SidekiqStatusMonitor.logger,
           Host: "0.0.0.0",
           Port: 7433,
           AccessLog: [],
@@ -44,7 +44,7 @@ RSpec.describe(SidekiqStatus::Server) do
     context "when we change the host config" do
       around do |example|
         ENV["SIDEKIQ_STATUS_HOST"] = "1.2.3.4"
-        SidekiqStatus.config.set_defaults
+        SidekiqStatusMonitor.config.set_defaults
 
         example.run
 
@@ -65,7 +65,7 @@ RSpec.describe(SidekiqStatus::Server) do
   describe "responses" do
     context "when service is alive" do
       before do
-        allow(SidekiqStatus).to(receive(:alive?) { true })
+        allow(SidekiqStatusMonitor).to(receive(:alive?) { true })
       end
       it "responds with success when the service is alive" do
         get "/"
@@ -76,7 +76,7 @@ RSpec.describe(SidekiqStatus::Server) do
 
     context "when service is not alive" do
       before do
-        allow(SidekiqStatus).to(receive(:alive?) { false })
+        allow(SidekiqStatusMonitor).to(receive(:alive?) { false })
       end
       it "responds to random path" do
         get "/unknown-path"
@@ -86,12 +86,12 @@ RSpec.describe(SidekiqStatus::Server) do
     end
   end
 
-  describe "SidekiqStatus setup host" do
+  describe "SidekiqStatusMonitor setup host" do
     subject(:host) { app.host }
 
     before do
       ENV["SIDEKIQ_STATUS_HOST"] = "1.2.3.4"
-      SidekiqStatus.config.set_defaults
+      SidekiqStatusMonitor.config.set_defaults
     end
 
     after do
@@ -103,12 +103,12 @@ RSpec.describe(SidekiqStatus::Server) do
     end
   end
 
-  describe "SidekiqStatus setup port" do
+  describe "SidekiqStatusMonitor setup port" do
     subject(:port) { app.port }
 
     before do
       ENV["SIDEKIQ_STATUS_PORT"] = "4567"
-      SidekiqStatus.config.set_defaults
+      SidekiqStatusMonitor.config.set_defaults
     end
 
     after do
@@ -120,12 +120,12 @@ RSpec.describe(SidekiqStatus::Server) do
     end
   end
 
-  describe "SidekiqStatus setup server" do
+  describe "SidekiqStatusMonitor setup server" do
     subject(:server) { app.engine }
 
     before do
       ENV["SIDEKIQ_STATUS_SERVER"] = "puma"
-      SidekiqStatus.config.set_defaults
+      SidekiqStatusMonitor.config.set_defaults
     end
 
     after do
@@ -137,9 +137,9 @@ RSpec.describe(SidekiqStatus::Server) do
     end
   end
 
-  describe "SidekiqStatus setup path" do
+  describe "SidekiqStatusMonitor setup path" do
     it "responds ok on any path" do
-      allow(SidekiqStatus).to(receive(:alive?) { true })
+      allow(SidekiqStatusMonitor).to(receive(:alive?) { true })
       get "/sidekiq-probe"
       expect(last_response).to(be_ok)
     end

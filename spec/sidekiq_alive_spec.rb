@@ -6,10 +6,10 @@ begin
 rescue LoadError # rubocop:disable Lint/SuppressedException
 end
 
-RSpec.describe(SidekiqStatus) do
+RSpec.describe(SidekiqStatusMonitor) do
   context "with configuration" do
     it "has a version number" do
-      expect(SidekiqStatus::VERSION).not_to(be(nil))
+      expect(SidekiqStatusMonitor::VERSION).not_to(be(nil))
     end
 
     it "configures the host from the #setup" do
@@ -23,7 +23,7 @@ RSpec.describe(SidekiqStatus) do
     it "configures the host from the SIDEKIQ_STATUS_HOST ENV var" do
       ENV["SIDEKIQ_STATUS_HOST"] = "1.2.3.4"
 
-      SidekiqStatus.config.set_defaults
+      SidekiqStatusMonitor.config.set_defaults
 
       expect(described_class.config.host).to(eq("1.2.3.4"))
 
@@ -41,7 +41,7 @@ RSpec.describe(SidekiqStatus) do
     it "configures the port from the SIDEKIQ_STATUS_PORT ENV var" do
       ENV["SIDEKIQ_STATUS_PORT"] = "4567"
 
-      SidekiqStatus.config.set_defaults
+      SidekiqStatusMonitor.config.set_defaults
 
       expect(described_class.config.port).to(eq("4567"))
 
@@ -66,7 +66,7 @@ RSpec.describe(SidekiqStatus) do
   end
 
   context "with redis" do
-    let(:sidekiq_7) { SidekiqStatus::Helpers.sidekiq_7 }
+    let(:sidekiq_7) { SidekiqStatusMonitor::Helpers.sidekiq_7 }
     # Older versions of sidekiq yielded Sidekiq module as configuration object
     # With sidekiq > 7, configuration is a separate class
     let(:sq_config) { sidekiq_7 ? Sidekiq.default_configuration : Sidekiq }
@@ -85,24 +85,24 @@ RSpec.describe(SidekiqStatus) do
     end
 
     it "::hostname" do
-      expect(SidekiqStatus.hostname).to(eq("test-hostname"))
+      expect(SidekiqStatusMonitor.hostname).to(eq("test-hostname"))
     end
 
     describe ".alive?" do
       context "when all conditions satisfied" do
         before do
-          allow(SidekiqStatus).to(receive(:queues_avg_latency) { 0 })
-          allow(SidekiqStatus).to(receive(:workers_size) { 0 })
-          allow(SidekiqStatus).to(receive(:process_set_size) { 1 })
-          allow(SidekiqStatus).to(receive(:queues_size) { 1 })
-          allow(SidekiqStatus).to(receive(:queues_avg_size) { 0 })
-          allow(SidekiqStatus).to(receive(:custom_probe) { true })
+          allow(SidekiqStatusMonitor).to(receive(:queues_avg_latency) { 0 })
+          allow(SidekiqStatusMonitor).to(receive(:workers_size) { 0 })
+          allow(SidekiqStatusMonitor).to(receive(:process_set_size) { 1 })
+          allow(SidekiqStatusMonitor).to(receive(:queues_size) { 1 })
+          allow(SidekiqStatusMonitor).to(receive(:queues_avg_size) { 0 })
+          allow(SidekiqStatusMonitor).to(receive(:custom_probe) { true })
         end
         it "returns true" do
-          expect(SidekiqStatus.alive?).to(be_truthy)
+          expect(SidekiqStatusMonitor.alive?).to(be_truthy)
         end
         it "returns info" do
-          expect(SidekiqStatus.info).to(eq(
+          expect(SidekiqStatusMonitor.info).to(eq(
             alive: true,
             workers_size: 0,
             process_set_size: 1,
@@ -117,10 +117,10 @@ RSpec.describe(SidekiqStatus) do
 
     describe "#start" do
       before do
-        allow(SidekiqStatus).to(receive(:fork) { 1 })
+        allow(SidekiqStatusMonitor).to(receive(:fork) { 1 })
         allow(sq_config).to(receive(:on).with(:startup) { |&arg| arg.call })
 
-        SidekiqStatus.instance_variable_set(:@redis, nil)
+        SidekiqStatusMonitor.instance_variable_set(:@redis, nil)
       end
 
 

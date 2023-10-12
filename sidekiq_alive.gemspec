@@ -3,22 +3,27 @@
 lib = File.expand_path("lib", __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require "sidekiq_status/version"
+require "sidekiq_status_monitor/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "sidekiq_status"
+  spec.name          = "sidekiq_status_monitor"
   spec.authors       = ["Andrei Makarov"]
   spec.email         = ["andrei@kiskolabs.com"]
 
-  spec.version       = SidekiqStatus::VERSION
+  spec.version       = SidekiqStatusMonitor::VERSION
 
   spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
 
-  spec.homepage      = "https://github.com/amkisko/sidekiq_status"
+  spec.homepage      = "https://github.com/amkisko/sidekiq_status_monitor"
   spec.summary       = "Sidekiq status web server extension."
   spec.license       = "MIT"
   spec.description   = <<~DSC
-    SidekiqStatus offers a solution to add HTTP server for the sidekiq instance.
+    SidekiqStatusMonitor offers a solution to add HTTP server for the sidekiq instance.
+
+    Can be used for Kubernetes livenessProbe and readinessProbe checks.
+    Other liveness/alive checks can be done too since the server returns 200/500 status codes.
+
+    Also provides a HTTP JSON interface for crawling metrics.
   DSC
 
   spec.metadata = {

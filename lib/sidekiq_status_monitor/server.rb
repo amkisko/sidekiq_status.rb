@@ -2,11 +2,11 @@
 
 require "rack"
 
-module SidekiqStatus
+module SidekiqStatusMonitor
   class Server
     attr_reader :host, :port, :engine, :logger
     def initialize(host: nil, port: nil, engine: nil, logger: nil, config: nil)
-      @config = config || SidekiqStatus.config
+      @config = config || SidekiqStatusMonitor.config
       @host = host || @config.host
       @port = port || @config.port
       @engine = engine || @config.server
@@ -26,11 +26,11 @@ module SidekiqStatus
     end
 
     def alive?
-      SidekiqStatus.alive?
+      SidekiqStatusMonitor.alive?
     end
 
     def payload
-      SidekiqStatus.info
+      SidekiqStatusMonitor.info
     end
 
     def call(_env)

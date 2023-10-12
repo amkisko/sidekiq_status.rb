@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SidekiqStatus
+module SidekiqStatusMonitor
   module Helpers
     class << self
       def sidekiq_7
