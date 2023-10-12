@@ -12,3 +12,5 @@ node_modules
 # rspec failure tracking
 .rspec_status
 vendor
+
+*.gem
