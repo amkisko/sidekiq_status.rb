@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
 
   spec.homepage      = "https://github.com/amkisko/sidekiq_status_monitor"
-  spec.summary       = "Sidekiq status web server extension."
+  spec.summary       = "Rack server that outputs HTTP JSON status of sidekiq instance for alive/liveness checks and monitoring."
   spec.license       = "MIT"
   spec.description   = <<~DSC
     SidekiqStatusMonitor offers a solution to add HTTP server for the sidekiq instance.
