@@ -6,10 +6,10 @@ begin
 rescue LoadError # rubocop:disable Lint/SuppressedException
 end
 
-RSpec.describe(SidekiqAlive) do
+RSpec.describe(SidekiqStatus) do
   context "with configuration" do
     it "has a version number" do
-      expect(SidekiqAlive::VERSION).not_to(be(nil))
+      expect(SidekiqStatus::VERSION).not_to(be(nil))
     end
 
     it "configures the host from the #setup" do
@@ -20,14 +20,14 @@ RSpec.describe(SidekiqAlive) do
       expect(described_class.config.host).to(eq("1.2.3.4"))
     end
 
-    it "configures the host from the SIDEKIQ_ALIVE_HOST ENV var" do
-      ENV["SIDEKIQ_ALIVE_HOST"] = "1.2.3.4"
+    it "configures the host from the SIDEKIQ_STATUS_HOST ENV var" do
+      ENV["SIDEKIQ_STATUS_HOST"] = "1.2.3.4"
 
-      SidekiqAlive.config.set_defaults
+      SidekiqStatus.config.set_defaults
 
       expect(described_class.config.host).to(eq("1.2.3.4"))
 
-      ENV["SIDEKIQ_ALIVE_HOST"] = nil
+      ENV["SIDEKIQ_STATUS_HOST"] = nil
     end
 
     it "configures the port from the #setup" do
@@ -38,14 +38,14 @@ RSpec.describe(SidekiqAlive) do
       expect(described_class.config.port).to(eq(4567))
     end
 
-    it "configures the port from the SIDEKIQ_ALIVE_PORT ENV var" do
-      ENV["SIDEKIQ_ALIVE_PORT"] = "4567"
+    it "configures the port from the SIDEKIQ_STATUS_PORT ENV var" do
+      ENV["SIDEKIQ_STATUS_PORT"] = "4567"
 
-      SidekiqAlive.config.set_defaults
+      SidekiqStatus.config.set_defaults
 
       expect(described_class.config.port).to(eq("4567"))
 
-      ENV["SIDEKIQ_ALIVE_PORT"] = nil
+      ENV["SIDEKIQ_STATUS_PORT"] = nil
     end
 
     it "configurations behave as expected" do
@@ -59,22 +59,6 @@ RSpec.describe(SidekiqAlive) do
       k.port = 4567
       expect(k.port).to(eq(4567))
 
-      expect(k.liveness_key).to(eq("SIDEKIQ::LIVENESS_PROBE_TIMESTAMP"))
-      k.liveness_key = "key"
-      expect(k.liveness_key).to(eq("key"))
-
-      expect(k.time_to_live).to(eq(10 * 60))
-      k.time_to_live = 2 * 60
-      expect(k.time_to_live).to(eq(2 * 60))
-
-      expect(k.callback.call).to(eq(nil))
-      k.callback = proc { "hello" }
-      expect(k.callback.call).to(eq("hello"))
-
-      expect(k.queue_prefix).to(eq(:"sidekiq-alive"))
-      k.queue_prefix = :other
-      expect(k.queue_prefix).to(eq(:other))
-
       expect(k.shutdown_callback.call).to(eq(nil))
       k.shutdown_callback = proc { "hello" }
       expect(k.shutdown_callback.call).to(eq("hello"))
@@ -82,7 +66,7 @@ RSpec.describe(SidekiqAlive) do
   end
 
   context "with redis" do
-    let(:sidekiq_7) { SidekiqAlive::Helpers.sidekiq_7 }
+    let(:sidekiq_7) { SidekiqStatus::Helpers.sidekiq_7 }
     # Older versions of sidekiq yielded Sidekiq module as configuration object
     # With sidekiq > 7, configuration is a separate class
     let(:sq_config) { sidekiq_7 ? Sidekiq.default_configuration : Sidekiq }
@@ -100,66 +84,46 @@ RSpec.describe(SidekiqAlive) do
       end
     end
 
-    it '::store_alive_key" stores key with the expected ttl' do
-      redis = SidekiqAlive.redis
-
-      expect(redis.ttl(SidekiqAlive.current_lifeness_key)).to(eq(-2))
-      SidekiqAlive.store_alive_key
-      expect(redis.ttl(SidekiqAlive.current_lifeness_key)).to(eq(SidekiqAlive.config.time_to_live))
-    end
-
-    it "::current_lifeness_key" do
-      expect(SidekiqAlive.current_lifeness_key).to(include("::test-hostname"))
-    end
-
     it "::hostname" do
-      expect(SidekiqAlive.hostname).to(eq("test-hostname"))
+      expect(SidekiqStatus.hostname).to(eq("test-hostname"))
     end
 
-    it "::alive?" do
-      expect(SidekiqAlive.alive?).to(be(false))
-      SidekiqAlive.store_alive_key
-      expect(SidekiqAlive.alive?).to(be(true))
-    end
-
-    context "::start" do
-      let(:queue_prefix) { :heathcheck }
-      let(:queues) do
-        next Sidekiq.default_configuration.capsules[SidekiqAlive::CAPSULE_NAME].queues if sidekiq_7
-
-        sq_config.options[:queues]
-      end
-
-      before do
-        allow(SidekiqAlive).to(receive(:fork) { 1 })
-        allow(sq_config).to(receive(:on).with(:startup) { |&arg| arg.call })
-
-        SidekiqAlive.instance_variable_set(:@redis, nil)
-      end
-
-      it "::registered_instances" do
-        SidekiqAlive.start
-        expect(SidekiqAlive.registered_instances.count).to(eq(1))
-        expect(SidekiqAlive.registered_instances.first).to(include("test-hostname"))
-      end
-
-      it "::unregister_current_instance" do
-        SidekiqAlive.start
-
-        expect(sq_config).to(have_received(:on).with(:quiet)) do |&arg|
-          arg.call
-
-          expect(SidekiqAlive.registered_instances.count).to(eq(0))
+    describe ".alive?" do
+      context "when all conditions satisfied" do
+        before do
+          allow(SidekiqStatus).to(receive(:queues_avg_latency) { 0 })
+          allow(SidekiqStatus).to(receive(:workers_size) { 0 })
+          allow(SidekiqStatus).to(receive(:process_set_size) { 1 })
+          allow(SidekiqStatus).to(receive(:queues_size) { 1 })
+          allow(SidekiqStatus).to(receive(:queues_avg_size) { 0 })
+          allow(SidekiqStatus).to(receive(:custom_probe) { true })
+        end
+        it "returns true" do
+          expect(SidekiqStatus.alive?).to(be_truthy)
+        end
+        it "returns info" do
+          expect(SidekiqStatus.info).to(eq(
+            alive: true,
+            workers_size: 0,
+            process_set_size: 1,
+            queues_size: 1,
+            queues_avg_latency: 0,
+            queues_avg_size: 0,
+            custom_probe: true,
+          ))
         end
       end
+    end
 
-      it "::queues" do
-        SidekiqAlive.config.queue_prefix = queue_prefix
+    describe "#start" do
+      before do
+        allow(SidekiqStatus).to(receive(:fork) { 1 })
+        allow(sq_config).to(receive(:on).with(:startup) { |&arg| arg.call })
 
-        SidekiqAlive.start
-
-        expect(queues.first).to(eq("#{queue_prefix}-test-hostname"))
+        SidekiqStatus.instance_variable_set(:@redis, nil)
       end
+
+
     end
   end
 end

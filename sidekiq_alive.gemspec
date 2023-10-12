@@ -3,31 +3,22 @@
 lib = File.expand_path("lib", __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require "sidekiq_alive/version"
+require "sidekiq_status/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "sidekiq_alive"
-  spec.authors       = ["Andrejs Cunskis", "Artur Pañach"]
-  spec.email         = ["andrejs.cunskis@gmail.com", "arturictus@gmail.com"]
+  spec.name          = "sidekiq_status"
+  spec.authors       = ["Andrei Makarov"]
+  spec.email         = ["andrei@kiskolabs.com"]
 
-  spec.version       = SidekiqAlive::VERSION
+  spec.version       = SidekiqStatus::VERSION
 
   spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
 
-  spec.homepage      = "https://github.com/arturictus/sidekiq_alive"
-  spec.summary       = "Liveness probe for sidekiq on Kubernetes deployments."
+  spec.homepage      = "https://github.com/amkisko/sidekiq_status"
+  spec.summary       = "Sidekiq status web server extension."
   spec.license       = "MIT"
   spec.description   = <<~DSC
-    SidekiqAlive offers a solution to add liveness probe of a Sidekiq instance.
-
-    How?
-
-    A http server is started and on each requests validates that a liveness key is stored in Redis. If it is there means is working.
-
-    A Sidekiq job is the responsable to storing this key. If Sidekiq stops processing jobs
-    this key gets expired by Redis an consequently the http server will return a 500 error.
-
-    This Job is responsible to requeue itself for the next liveness probe.
+    SidekiqStatus offers a solution to add HTTP server for the sidekiq instance.
   DSC
 
   spec.metadata = {

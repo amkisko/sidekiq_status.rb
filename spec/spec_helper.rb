@@ -6,7 +6,7 @@ require "simplecov-cobertura"
 SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
 
 require "bundler/setup"
-require "sidekiq_alive"
+require "sidekiq_status"
 require "rspec-sidekiq"
 require "rack/test"
 require "debug"
@@ -29,6 +29,6 @@ RSpec.configure do |config|
 
   config.before do
     Sidekiq.redis(&:flushall)
-    SidekiqAlive.config.set_defaults
+    SidekiqStatus.config.set_defaults
   end
 end

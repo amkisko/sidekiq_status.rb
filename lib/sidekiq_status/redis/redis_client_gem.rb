@@ -2,7 +2,7 @@
 
 require_relative "base"
 
-module SidekiqAlive
+module SidekiqStatus
   module Redis
     # Wrapper for `redis-client` gem used by `sidekiq` > 7
     # https://github.com/redis-rb/redis-client

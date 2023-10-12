@@ -9,7 +9,7 @@ task default: :spec
 
 desc "Update version"
 task :version, :new_version do |_, args|
-  version_file_path = "lib/sidekiq_alive/version.rb"
+  version_file_path = "lib/sidekiq_status/version.rb"
   new_version = args[:new_version]
   version_file = File.read(version_file_path)
 

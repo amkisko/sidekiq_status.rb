@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe(SidekiqAlive::Redis) do
-  let(:redis) { SidekiqAlive::Redis.adapter }
+RSpec.describe(SidekiqStatus::Redis) do
+  let(:redis) { SidekiqStatus::Redis.adapter }
 
   it "Works" do
     time = Time.now.to_s

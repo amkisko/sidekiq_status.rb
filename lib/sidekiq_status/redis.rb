@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SidekiqAlive
+module SidekiqStatus
   module Redis
     class << self
       def adapter

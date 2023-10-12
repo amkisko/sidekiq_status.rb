@@ -1,12 +1,11 @@
-# SidekiqAlive
+# SidekiqStatus
 
-[![Gem Version](https://badge.fury.io/rb/sidekiq_alive.svg)](https://rubygems.org/gems/sidekiq_alive)
-[![Total Downloads](https://img.shields.io/gem/dt/sidekiq_alive?color=blue)](https://rubygems.org/gems/https://rubygems.org/gems/sidekiq_alive)
-![Workflow status](https://github.com/allure-framework/allure-ruby/workflows/Test/badge.svg)
+[![Gem Version](https://badge.fury.io/rb/sidekiq_status.svg)](https://rubygems.org/gems/sidekiq_status)
+[![Total Downloads](https://img.shields.io/gem/dt/sidekiq_status?color=blue)](https://rubygems.org/gems/https://rubygems.org/gems/sidekiq_status)
 
 ---
 
-SidekiqAlive offers a solution to add liveness probe for a Sidekiq instance deployed in Kubernetes.
+SidekiqStatus offers a solution to add liveness probe for a Sidekiq instance deployed in Kubernetes.
 This library can be used to check sidekiq health outside kubernetes.
 
 **How?**
@@ -20,21 +19,21 @@ This worker is responsible to requeue itself for the next liveness probe.
 
 Each instance in kubernetes will be checked based on `ENV` variable `HOSTNAME` (kubernetes sets this for each replica/pod).
 
-On initialization SidekiqAlive will asign to Sidekiq::Worker a queue with the current host and add this queue to the current instance queues to process.
+On initialization SidekiqStatus will asign to Sidekiq::Worker a queue with the current host and add this queue to the current instance queues to process.
 
 example:
 
 ```
 hostname: foo
-  Worker queue: sidekiq_alive-foo
+  Worker queue: sidekiq_status-foo
   instance queues:
-   - sidekiq_alive-foo
+   - sidekiq_status-foo
    *- your queues
 
 hostname: bar
-  Worker queue: sidekiq_alive-bar
+  Worker queue: sidekiq_status-bar
   instance queues:
-   - sidekiq_alive-bar
+   - sidekiq_status-bar
    *- your queues
 ```
 
@@ -43,7 +42,7 @@ hostname: bar
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sidekiq_alive'
+gem 'sidekiq_status'
 ```
 
 And then execute:
@@ -52,34 +51,42 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install sidekiq_alive
+    $ gem install sidekiq_status
 
 ## Usage
 
-SidekiqAlive will start when running `sidekiq` command.
+SidekiqStatus will start when running `sidekiq` command.
 
-Run `Sidekiq`
+Run `Sidekiq`:
 
-```
+```bash
 bundle exec sidekiq
 ```
 
+Bash example:
+
+```bash
+curl -v localhost:7433
 ```
-curl localhost:7433
-#=> Alive!
+
+Ruby example:
+
+```ruby
+uri = URI.parse("http://localhost:7433")
+Net::HTTP.get_response(uri).body
 ```
 
 **how to disable?**
-You can disabled by setting `ENV` variable `DISABLE_SIDEKIQ_ALIVE`
+You can disabled by setting `ENV` variable `DISABLE_SIDEKIQ_STATUS`
 example:
 
-```
-DISABLE_SIDEKIQ_ALIVE=true bundle exec sidekiq
+```bash
+DISABLE_SIDEKIQ_STATUS=true bundle exec sidekiq
 ```
 
 ### Kubernetes setup
 
-Set `livenessProbe` in your Kubernetes deployment
+Set `livenessProbe` and `readinessProbe` in your Kubernetes deployment
 
 example with recommended setup:
 
@@ -176,95 +183,42 @@ spec:
   terminationGracePeriodSeconds: 60 # put your longest Job time here plus security time.
 ```
 
-### Outside kubernetes
-
-It's just up to you how you want to use it.
-
-An example in local would be:
-
-```
-bundle exec sidekiq
-# let it initialize ...
-```
-
-```
-curl localhost:7433
-#=> Alive!
-```
-
 ## Options
 
 ```ruby
-SidekiqAlive.setup do |config|
+SidekiqStatus.setup do |config|
   # ==> Server host
   # Host to bind the server.
-  # Can also be set with the environment variable SIDEKIQ_ALIVE_HOST.
+  # Can also be set with the environment variable sidekiq_status_HOST.
   # default: 0.0.0.0
   #
   #   config.host = 0.0.0.0
 
   # ==> Server port
   # Port to bind the server.
-  # Can also be set with the environment variable SIDEKIQ_ALIVE_PORT.
+  # Can also be set with the environment variable sidekiq_status_PORT.
   # default: 7433
   #
   #   config.port = 7433
-
-  # ==> Server path
-  # HTTP path to respond to.
-  # Can also be set with the environment variable SIDEKIQ_ALIVE_PATH.
-  # default: '/'
-  #
-  #   config.path = '/'
 
   # ==> Custom Liveness Probe
   # Extra check to decide if restart the pod or not for example connection to DB.
   # `false`, `nil` or `raise` will not write the liveness probe
   # default: proc { true }
   #
-  #     config.custom_liveness_probe = proc { db_running? }
-
-  # ==> Liveness key
-  # Key to be stored in Redis as probe of liveness
-  # default: "SIDEKIQ::LIVENESS_PROBE_TIMESTAMP"
-  #
-  #   config.liveness_key = "SIDEKIQ::LIVENESS_PROBE_TIMESTAMP"
-
-  # ==> Time to live
-  # Time for the key to be kept by Redis.
-  # Here is where you can set de periodicity that the Sidekiq has to probe it is working
-  # Time unit: seconds
-  # default: 10 * 60 # 10 minutes
-  #
-  #   config.time_to_live = 10 * 60
-
-  # ==> Callback
-  # After the key is stored in redis you can perform anything.
-  # For example a webhook or email to notify the team
-  # default: proc {}
-  #
-  #    require 'net/http'
-  #    config.callback = proc { Net::HTTP.get("https://status.com/ping") }
+  #     config.custom_probe = proc { db_running? }
 
   # ==> Shutdown callback
   # When sidekiq process is shutting down, you can perform some action, like cleaning up created queue
   # default: proc {}
   #
   #    config.shutdown_callback = proc do
-  #      Sidekiq::Queue.all.find { |q| q.name == "#{config.queue_prefix}-#{SidekiqAlive.hostname}" }&.clear
+  #      Sidekiq::Queue.all.find { |q| q.name == "#{config.queue_prefix}-#{SidekiqStatus.hostname}" }&.clear
   #    end
 
-  # ==> Queue Prefix
-  # SidekiqAlive will run in a independent queue for each instance/replica
-  # This queue name will be generated with: "#{queue_prefix}-#{hostname}.
-  # You can customize the prefix here.
-  # default: :sidekiq-alive
-  #
-  #    config.queue_prefix = :other
-
   # ==> Rack server
-  # Web server used to serve an HTTP response.
-  # Can also be set with the environment variable SIDEKIQ_ALIVE_SERVER.
+  # Web server used to serve an HTTP response, e.g. 'webrick', 'puma', 'thin', etc.
+  # Can also be set with the environment variable sidekiq_status_SERVER.
   # default: 'webrick'
   #
   #    config.server = 'puma'
@@ -277,11 +231,9 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
-Here is an example [rails app](https://github.com/arturictus/sidekiq_alive_example)
-
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/arturictus/sidekiq_alive. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/arturictus/sidekiq_status. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 

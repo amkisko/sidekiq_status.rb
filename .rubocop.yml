@@ -2,7 +2,7 @@ inherit_gem:
   rubocop-shopify: rubocop.yml
 
 AllCops:
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.2
   SuggestExtensions: false
   NewCops: enable
 
@@ -12,4 +12,4 @@ Layout/ArgumentAlignment:
 
 Style/InvertibleUnlessCondition:
   Exclude:
-    - "lib/sidekiq_alive.rb"
+    - "lib/sidekiq_status.rb"
