@@ -9,13 +9,13 @@ e() {
     eval "$1"
 }
 
-e "bundle"
-e "bundle exec rspec"
-
 if [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]]; then
   echo -e "\033[1;31mgit working directory not clean, please commit your changes first \033[0m"
   exit 1
 fi
+
+e "bundle"
+e "bundle exec rspec"
 
 GEM_NAME="sidekiq_status_monitor"
 VERSION=$(grep -Eo "VERSION\s*=\s*'.+'" lib/sidekiq_status_monitor/version.rb  | grep -Eo "[0-9.]{5,}")
