@@ -10,32 +10,9 @@ This library can be used to check sidekiq health outside kubernetes.
 
 **How?**
 
-A http server is started and on each requests validates that a liveness key is stored in Redis. If it is there means is working.
+Additional HTTP server is started during Sidekiq worker initialisation and on each requests validates that the Sidekiq worker metrics look healthy.
 
-A Sidekiq worker is the responsible to storing this key. If Sidekiq stops processing workers
-this key gets expired by Redis an consequently the http server will return a 500 error.
-
-This worker is responsible to requeue itself for the next liveness probe.
-
-Each instance in kubernetes will be checked based on `ENV` variable `HOSTNAME` (kubernetes sets this for each replica/pod).
-
-On initialization SidekiqStatusMonitor will asign to Sidekiq::Worker a queue with the current host and add this queue to the current instance queues to process.
-
-example:
-
-```
-hostname: foo
-  Worker queue: sidekiq_status_monitor-foo
-  instance queues:
-   - sidekiq_status_monitor-foo
-   *- your queues
-
-hostname: bar
-  Worker queue: sidekiq_status_monitor-bar
-  instance queues:
-   - sidekiq_status_monitor-bar
-   *- your queues
-```
+It reports either 200 or 500 HTTP code with additional JSON payload which includes metrics values.
 
 ## Installation
 
