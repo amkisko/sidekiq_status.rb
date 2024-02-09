@@ -10,7 +10,7 @@ This library can be used to check sidekiq health outside kubernetes.
 
 **How?**
 
-Additional HTTP server is started during Sidekiq worker initialisation and on each requests validates that the Sidekiq worker metrics look healthy.
+An additional HTTP server is started during Sidekiq worker initialisation and on each request validates that the Sidekiq worker metrics look healthy.
 
 It reports either 200 or 500 HTTP code with additional JSON payload which includes metrics values.
 
