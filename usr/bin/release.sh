@@ -18,7 +18,7 @@ e "bundle"
 e "bundle exec rspec"
 
 GEM_NAME="sidekiq_status_monitor"
-VERSION=$(grep -Eo "VERSION\s*=\s*'.+'" lib/sidekiq_status_monitor/version.rb  | grep -Eo "[0-9.]{5,}")
+VERSION=$(grep -Eo "VERSION\s*=\s*\".+\"" lib/sidekiq_status_monitor/version.rb  | grep -Eo "[0-9.]{5,}")
 GEM_FILE="$GEM_NAME-$VERSION.gem"
 
 e "gem build $GEM_NAME.gemspec"
