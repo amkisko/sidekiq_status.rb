@@ -37,8 +37,8 @@ module SidekiqStatusMonitor
 
       private
 
-      def redis(&block)
-        Sidekiq.redis(&block)
+      def redis(&)
+        Sidekiq.redis(&)
       end
     end
   end

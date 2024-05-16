@@ -101,8 +101,8 @@ module SidekiqStatusMonitor
       queues.map(&:name).uniq.sort
     end
 
-    def self.new_probe(name, &block)
-      define_method("#{PROBE_METHOD_PREFIX}#{name}", &block)
+    def self.new_probe(name, &)
+      define_method(:"#{PROBE_METHOD_PREFIX}#{name}", &)
     end
 
     new_probe :workers_size do
@@ -126,7 +126,7 @@ module SidekiqStatusMonitor
     end
 
     def probes
-      methods.grep(/^#{PROBE_METHOD_PREFIX}/).map { |m| [m, send(m)] }.to_h
+      methods.grep(/^#{PROBE_METHOD_PREFIX}/o).map { |m| [m, send(m)] }.to_h
     end
 
     def alive?

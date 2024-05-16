@@ -33,8 +33,8 @@ RSpec.describe(SidekiqStatusMonitor::Server) do
           Logger: SidekiqStatusMonitor.logger,
           Host: "0.0.0.0",
           Port: 7433,
-          AccessLog: [],
-        ),
+          AccessLog: []
+        )
       ))
 
       subject
@@ -53,7 +53,7 @@ RSpec.describe(SidekiqStatusMonitor::Server) do
       it "respects the SIDEKIQ_STATUS_HOST environment variable" do
         expect(fake_webrick).to(receive(:run).with(
           described_class,
-          hash_including(Host: "1.2.3.4"),
+          hash_including(Host: "1.2.3.4")
         ))
 
         subject

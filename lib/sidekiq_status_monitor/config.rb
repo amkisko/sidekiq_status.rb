@@ -5,16 +5,16 @@ module SidekiqStatusMonitor
     include Singleton
 
     attr_accessor :host,
-                  :port,
-                  :path,
-                  :server,
-                  :logger,
-                  :shutdown_callback,
-                  :workers_size_threshold,
-                  :process_set_size_threshold,
-                  :queues_size_threshold,
-                  :queue_latency_threshold,
-                  :queue_size_threshold
+      :port,
+      :path,
+      :server,
+      :logger,
+      :shutdown_callback,
+      :workers_size_threshold,
+      :process_set_size_threshold,
+      :queues_size_threshold,
+      :queue_latency_threshold,
+      :queue_size_threshold
 
     def initialize
       set_defaults

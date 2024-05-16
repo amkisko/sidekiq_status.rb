@@ -6,18 +6,18 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "sidekiq_status_monitor/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "sidekiq_status_monitor"
-  spec.authors       = ["Andrei Makarov"]
-  spec.email         = ["andrei@kiskolabs.com"]
+  spec.name = "sidekiq_status_monitor"
+  spec.authors = ["Andrei Makarov"]
+  spec.email = ["andrei@kiskolabs.com"]
 
-  spec.version       = SidekiqStatusMonitor::VERSION
+  spec.version = SidekiqStatusMonitor::VERSION
 
   spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
 
-  spec.homepage      = "https://github.com/amkisko/sidekiq_status_monitor"
-  spec.summary       = "Rack server that outputs HTTP JSON status of sidekiq instance for alive/liveness checks and monitoring."
-  spec.license       = "MIT"
-  spec.description   = <<~DSC
+  spec.homepage = "https://github.com/amkisko/sidekiq_status_monitor"
+  spec.summary = "Rack server that outputs HTTP JSON status of sidekiq instance for alive/liveness checks and monitoring."
+  spec.license = "MIT"
+  spec.description = <<~DSC
     SidekiqStatusMonitor offers a solution to add HTTP server for the sidekiq instance.
 
     Can be used for Kubernetes livenessProbe and readinessProbe checks.
@@ -31,10 +31,10 @@ Gem::Specification.new do |spec|
     "source_code_uri" => spec.homepage,
     "changelog_uri" => "#{spec.homepage}/releases",
     "documentation_uri" => "#{spec.homepage}/blob/v#{spec.version}/README.md",
-    "bug_tracker_uri" => "#{spec.homepage}/issues",
+    "bug_tracker_uri" => "#{spec.homepage}/issues"
   }
 
-  spec.files         = Dir["README.md", "lib/**/*"]
+  spec.files = Dir["README.md", "lib/**/*"]
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency("bundler", "> 1.16")

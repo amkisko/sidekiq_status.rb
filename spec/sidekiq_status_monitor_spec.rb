@@ -120,8 +120,6 @@ RSpec.describe(SidekiqStatusMonitor) do
 
         SidekiqStatusMonitor.instance_variable_set(:@redis, nil)
       end
-
-
     end
   end
 end

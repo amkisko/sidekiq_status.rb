@@ -43,9 +43,9 @@ module SidekiqStatusMonitor
 
       private
 
-      def redis(&block)
+      def redis(&)
         # Default to Sidekiq.redis if capsule is not configured yet but redis adapter is accessed
-        (@capsule || Sidekiq).redis(&block)
+        (@capsule || Sidekiq).redis(&)
       end
     end
   end

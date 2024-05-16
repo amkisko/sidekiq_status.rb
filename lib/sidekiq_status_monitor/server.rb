@@ -36,7 +36,7 @@ module SidekiqStatusMonitor
     def call(_env)
       [
         alive? ? 200 : 500,
-        { "Content-Type" => "application/json" },
+        {"Content-Type" => "application/json"},
         [payload.to_json]
       ]
     end
