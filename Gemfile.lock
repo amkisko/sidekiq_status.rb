@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sidekiq_status_monitor (1.0.1)
+    sidekiq_status_monitor (1.2.0)
       sidekiq (>= 5, < 8)
       webrick (>= 1, < 2)
 
