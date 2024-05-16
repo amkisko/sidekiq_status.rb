@@ -6,7 +6,6 @@
 /pkg/
 /spec/reports/
 /tmp/
-Gemfile.lock
 node_modules
 
 # rspec failure tracking
