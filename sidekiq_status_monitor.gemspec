@@ -50,4 +50,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency("sidekiq", ">= 5", "< 8")
   spec.add_dependency("webrick", ">= 1", "< 2")
+  spec.add_dependency("rackup", ">= 2", "< 3")
 end

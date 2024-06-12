@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "rack"
+require "rackup"
 
 module SidekiqStatusMonitor
   class Server
@@ -14,7 +14,7 @@ module SidekiqStatusMonitor
     end
 
     def run!
-      handler = Rack::Handler.get(@engine)
+      handler = Rackup::Handler.get(@engine)
       Signal.trap("TERM") { handler.shutdown }
       handler.run(
         self,
